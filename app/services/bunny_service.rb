@@ -1,6 +1,6 @@
 class BunnyService
 
-  attr_reader :send_read
+  attr_reader :receive_read
 
   def initialize
     connection = Bunny.new(
@@ -11,14 +11,15 @@ class BunnyService
     )
     connection.start
     channel = connection.create_channel
-    @receive_read = channel.queue("read.link")
+    @receive_read = channel.queue("ep.read.link")
   end
 
 
   def receive_link
     @receive_read.subscribe do |delivery_info, metadata, payload|
-    puts "Got: #{payload}"
-  
+      link = Link.create(url: payload)
+      # link.read_count += 1
+      # link.save
     end
   end
 
